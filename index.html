@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LICORERIA ANC</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        header, footer {
+            background-color: #aca569;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            width: 50%;
+        }
+        header img {
+            max-width: 50px;
+            vertical-align: middle;
+        }
+        header h1 {
+            display: inline;
+            margin-left: 10px;
+        }
+        footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+        main {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 80%;
+            max-width: 800px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        img {
+            width: 50px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            width: 50%;
+        }
+        form label, form input, form button {
+            margin: 5px 0;
+        }
+        form button {
+            align-self: center;
+        }
+    </style>
+    <!-- Incluir Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.9.3/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.9.3/firebase-firestore-compat.js"></script>
+    <script>
+        // Configuración de Firebase
+        const firebaseConfig = {
+  apiKey: "AIzaSyBtbwtEV54UibTbNI2rLS08xhiR0CquMC0",
+  authDomain: "licoreria-c33d4.firebaseapp.com",
+  databaseURL: "https://licoreria-c33d4-default-rtdb.firebaseio.com",
+  projectId: "licoreria-c33d4",
+  storageBucket: "licoreria-c33d4.appspot.com",
+  messagingSenderId: "236261862007",
+  appId: "1:236261862007:web:78f96318a93f483b92b472",
+  measurementId: "G-BW9GSQNXW6"
+};
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+    </script>
+</head>
+<body>
+<header>
+    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcStoerRU2bpHDVdA7Xt-5AIrG7TR6-ohu_0yBuDuKslmQ&s" alt="Logo">
+    <h1>BAR</h1>
+</header>
+<main>
+    <h2>Registro</h2>
+
+    <form id="shoeForm">
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" name="nombre" required>
+
+        <label for="marca">Marca:</label>
+        <input type="text" id="marca" name="marca" required>
+
+        <label for="tipo">Tipo:</label>
+        <input type="text" id="tipo" name="tipo" required>
+
+        <label for="descripcion">Descripción:</label>
+        <input type="text" id="descripcion" name="descripcion" required>
+
+        <label for="precio">Precio:</label>
+        <input type="number" id="precio" name="precio" required>
+
+        <button type="button" onclick="saveShoe()">Guardar</button>
+    </form>
+    <h2>EN LISTA</h2>
+    <table id="shoeTable">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Marca</th>
+                <th>Tipo</th>
+                <th>Descripción</th>
+                <th>Precio</th>
+            </tr>
+        </thead>
+        <tbody id="shoeTableBody">
+            <!-- Filas se añadirán dinámicamente -->
+        </tbody>
+    </table>
+    <br><br>
+</main>
+<br><br>
+<footer>
+    <p>&copy; RESERVADO POR ABRAHAM NACIMBA</p>
+</footer>
+<script>
+    let shoes = [];
+    let currentIndex = null;
+    const dbCollection = db.collection("Zapatos123");
+
+    async function saveShoe() {
+        const shoeForm = document.forms.shoeForm;
+        const newShoe = {
+            nombre: shoeForm.nombre.value,
+            marca: shoeForm.marca.value,
+            tipo: shoeForm.tipo.value,
+            descripcion: shoeForm.descripcion.value,
+            precio: parseFloat(shoeForm.precio.value),
+        };
+
+        if (currentIndex === null) {
+            await dbCollection.add(newShoe);
+        } else {
+            const id = shoes[currentIndex].id;
+            await dbCollection.doc(id).update(newShoe);
+        }
+
+        loadShoes();
+        shoeForm.reset();
+        currentIndex = null;
+    }
+
+    async function loadShoes() {
+        const snapshot = await dbCollection.get();
+        shoes = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+        renderTable();
+    }
+
+    function renderTable() {
+        const tableBody = document.getElementById('shoeTableBody');
+        tableBody.innerHTML = '';
+
+        shoes.forEach((shoe, index) => {
+            const row = document.createElement('tr');
+
+            row.innerHTML = `
+                <td>${shoe.nombre}</td>
+                <td>${shoe.marca}</td>
+                <td>${shoe.tipo}</td>
+                <td>${shoe.descripcion}</td>
+                <td>${shoe.precio}</td>
+                <td>
+                    <button onclick="loadForm(${index})">Editar</button>
+                    <button onclick="deleteShoe(${index})">Eliminar</button>
+                </td>
+            `;
+            tableBody.appendChild(row);
+        });
+    }
+
+    function loadForm(index) {
+        const shoe = shoes[index];
+        const shoeForm = document.forms.shoeForm;
+        shoeForm.nombre.value = shoe.nombre;
+        shoeForm.marca.value = shoe.marca;
+        shoeForm.tipo.value = shoe.tipo;
+        shoeForm.descripcion.value = shoe.descripcion;
+        shoeForm.precio.value = shoe.precio;
+        currentIndex = index;
+    }
+
+    async function deleteShoe(index) {
+        const id = shoes[index].id;
+        await dbCollection.doc(id).delete();
+        loadShoes();
+        document.forms.shoeForm.reset();
+        currentIndex = null;
+    }
+
+    loadShoes();
+</script>
+</body>
+</html>

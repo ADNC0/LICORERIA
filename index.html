@@ -74,15 +74,14 @@
     <script>
         // Configuración de Firebase
         const firebaseConfig = {
-  apiKey: "AIzaSyBtbwtEV54UibTbNI2rLS08xhiR0CquMC0",
-  authDomain: "licoreria-c33d4.firebaseapp.com",
-  databaseURL: "https://licoreria-c33d4-default-rtdb.firebaseio.com",
-  projectId: "licoreria-c33d4",
-  storageBucket: "licoreria-c33d4.appspot.com",
-  messagingSenderId: "236261862007",
-  appId: "1:236261862007:web:78f96318a93f483b92b472",
-  measurementId: "G-BW9GSQNXW6"
-};
+            apiKey: "AIzaSyBtbwtEV54UibTbNI2rLS08xhiR0CquMC0",
+            authDomain: "licoreria-c33d4.firebaseapp.com",
+            projectId: "licoreria-c33d4",
+            storageBucket: "licoreria-c33d4.appspot.com",
+            messagingSenderId: "236261862007",
+            appId: "1:236261862007:web:78f96318a93f483b92b472",
+            measurementId: "G-BW9GSQNXW6"
+        };
         // Inicializar Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
@@ -96,7 +95,7 @@
 <main>
     <h2>Registro</h2>
 
-    <form id="shoeForm">
+    <form id="productoForm">
         <label for="nombre">Nombre:</label>
         <input type="text" id="nombre" name="nombre" required>
 
@@ -112,10 +111,10 @@
         <label for="precio">Precio:</label>
         <input type="number" id="precio" name="precio" required>
 
-        <button type="button" onclick="saveShoe()">Guardar</button>
+        <button type="button" onclick="saveProducto()">Guardar</button>
     </form>
     <h2>EN LISTA</h2>
-    <table id="shoeTable">
+    <table id="productoTable">
         <thead>
             <tr>
                 <th>Nombre</th>
@@ -123,9 +122,10 @@
                 <th>Tipo</th>
                 <th>Descripción</th>
                 <th>Precio</th>
+                <th>Acciones</th>
             </tr>
         </thead>
-        <tbody id="shoeTableBody">
+        <tbody id="productoTableBody">
             <!-- Filas se añadirán dinámicamente -->
         </tbody>
     </table>
@@ -136,54 +136,54 @@
     <p>&copy; RESERVADO POR ABRAHAM NACIMBA</p>
 </footer>
 <script>
-    let shoes = [];
+    let productos = [];
     let currentIndex = null;
     const dbCollection = db.collection("producto");
 
-    async function saveShoe() {
-        const shoeForm = document.forms.shoeForm;
-        const newShoe = {
-            nombre: shoeForm.nombre.value,
-            marca: shoeForm.marca.value,
-            tipo: shoeForm.tipo.value,
-            descripcion: shoeForm.descripcion.value,
-            precio: parseFloat(shoeForm.precio.value),
+    async function saveProducto() {
+        const productoForm = document.forms.productoForm;
+        const newProducto = {
+            nombre: productoForm.nombre.value,
+            marca: productoForm.marca.value,
+            tipo: productoForm.tipo.value,
+            descripcion: productoForm.descripcion.value,
+            precio: parseFloat(productoForm.precio.value),
         };
 
         if (currentIndex === null) {
-            await dbCollection.add(newShoe);
+            await dbCollection.add(newProducto);
         } else {
-            const id = shoes[currentIndex].id;
-            await dbCollection.doc(id).update(newShoe);
+            const id = productos[currentIndex].id;
+            await dbCollection.doc(id).update(newProducto);
         }
 
-        loadShoes();
-        shoeForm.reset();
+        loadProductos();
+        productoForm.reset();
         currentIndex = null;
     }
 
-    async function loadShoes() {
+    async function loadProductos() {
         const snapshot = await dbCollection.get();
-        shoes = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+        productos = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
         renderTable();
     }
 
     function renderTable() {
-        const tableBody = document.getElementById('shoeTableBody');
+        const tableBody = document.getElementById('productoTableBody');
         tableBody.innerHTML = '';
 
-        shoes.forEach((shoe, index) => {
+        productos.forEach((producto, index) => {
             const row = document.createElement('tr');
 
             row.innerHTML = `
-                <td>${shoe.nombre}</td>
-                <td>${shoe.marca}</td>
-                <td>${shoe.tipo}</td>
-                <td>${shoe.descripcion}</td>
-                <td>${shoe.precio}</td>
+                <td>${producto.nombre}</td>
+                <td>${producto.marca}</td>
+                <td>${producto.tipo}</td>
+                <td>${producto.descripcion}</td>
+                <td>${producto.precio}</td>
                 <td>
                     <button onclick="loadForm(${index})">Editar</button>
-                    <button onclick="deleteShoe(${index})">Eliminar</button>
+                    <button onclick="deleteProducto(${index})">Eliminar</button>
                 </td>
             `;
             tableBody.appendChild(row);
@@ -191,25 +191,25 @@
     }
 
     function loadForm(index) {
-        const shoe = shoes[index];
-        const shoeForm = document.forms.shoeForm;
-        shoeForm.nombre.value = shoe.nombre;
-        shoeForm.marca.value = shoe.marca;
-        shoeForm.tipo.value = shoe.tipo;
-        shoeForm.descripcion.value = shoe.descripcion;
-        shoeForm.precio.value = shoe.precio;
+        const producto = productos[index];
+        const productoForm = document.forms.productoForm;
+        productoForm.nombre.value = producto.nombre;
+        productoForm.marca.value = producto.marca;
+        productoForm.tipo.value = producto.tipo;
+        productoForm.descripcion.value = producto.descripcion;
+        productoForm.precio.value = producto.precio;
         currentIndex = index;
     }
 
-    async function deleteShoe(index) {
-        const id = shoes[index].id;
+    async function deleteProducto(index) {
+        const id = productos[index].id;
         await dbCollection.doc(id).delete();
-        loadShoes();
-        document.forms.shoeForm.reset();
+        loadProductos();
+        document.forms.productoForm.reset();
         currentIndex = null;
     }
 
-    loadShoes();
+    loadProductos();
 </script>
 </body>
 </html>

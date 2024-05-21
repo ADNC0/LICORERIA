@@ -19,7 +19,7 @@
             color: white;
             text-align: center;
             padding: 10px 0;
-            width: 50%;
+            width: 100%;
         }
         header img {
             max-width: 50px;
@@ -108,6 +108,21 @@
         <label for="descripcion">Descripción:</label>
         <input type="text" id="descripcion" name="descripcion" required>
 
+        <label for="volumen">Volumen:</label>
+        <input type="number" id="volumen" name="volumen" required>
+
+        <label for="grado">Grado de Alcohol:</label>
+        <input type="number" id="grado" name="grado" required>
+
+        <label for="stock">Stock:</label>
+        <input type="number" id="stock" name="stock" required>
+
+        <label for="categoria">Categoría:</label>
+        <input type="text" id="categoria" name="categoria" required>
+
+        <label for="valoracion">Valoración:</label>
+        <input type="number" id="valoracion" name="valoracion" required>
+
         <label for="precio">Precio:</label>
         <input type="number" id="precio" name="precio" required>
 
@@ -121,6 +136,11 @@
                 <th>Marca</th>
                 <th>Tipo</th>
                 <th>Descripción</th>
+                <th>Volumen</th>
+                <th>Grado de Alcohol</th>
+                <th>Stock</th>
+                <th>Categoría</th>
+                <th>Valoración</th>
                 <th>Precio</th>
                 <th>Acciones</th>
             </tr>
@@ -147,6 +167,11 @@
             marca: productoForm.marca.value,
             tipo: productoForm.tipo.value,
             descripcion: productoForm.descripcion.value,
+            volumen: parseFloat(productoForm.volumen.value),
+            grado: parseFloat(productoForm.grado.value),
+            stock: parseInt(productoForm.stock.value),
+            categoria: productoForm.categoria.value,
+            valoracion: parseFloat(productoForm.valoracion.value),
             precio: parseFloat(productoForm.precio.value),
         };
 
@@ -180,6 +205,11 @@
                 <td>${producto.marca}</td>
                 <td>${producto.tipo}</td>
                 <td>${producto.descripcion}</td>
+                <td>${producto.volumen}</td>
+                <td>${producto.grado}</td>
+                <td>${producto.stock}</td>
+                <td>${producto.categoria}</td>
+                <td>${producto.valoracion}</td>
                 <td>${producto.precio}</td>
                 <td>
                     <button onclick="loadForm(${index})">Editar</button>
@@ -197,6 +227,11 @@
         productoForm.marca.value = producto.marca;
         productoForm.tipo.value = producto.tipo;
         productoForm.descripcion.value = producto.descripcion;
+        productoForm.volumen.value = producto.volumen;
+        productoForm.grado.value = producto.grado;
+        productoForm.stock.value = producto.stock;
+        productoForm.categoria.value = producto.categoria;
+        productoForm.valoracion.value = producto.valoracion;
         productoForm.precio.value = producto.precio;
         currentIndex = index;
     }

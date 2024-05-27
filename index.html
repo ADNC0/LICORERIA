@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LICORERIA AN</title>
+    <title>LICORERIA ANC</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -13,6 +13,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            background-color: #f0f0f0;
         }
         header, footer {
             background-color: #aca569;
@@ -40,6 +41,11 @@
             align-items: center;
             width: 80%;
             max-width: 800px;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            margin-top: 20px;
         }
         table {
             width: 100%;
@@ -89,11 +95,13 @@
 </head>
 <body>
 <header>
+    <a href="login.html"><button>Logueo</button></a>
     <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcStoerRU2bpHDVdA7Xt-5AIrG7TR6-ohu_0yBuDuKslmQ&s" alt="Logo">
     <h1>BAR</h1>
 </header>
+
 <main>
-    <h2>Registro</h2>
+    <h2>Registro de Productos</h2>
 
     <form id="productoForm">
         <label for="nombre">Nombre:</label>
@@ -151,56 +159,72 @@
     </table>
     <br><br>
 </main>
-<br><br>
+
 <footer>
     <p>&copy; RESERVADO POR ABRAHAM NACIMBA</p>
 </footer>
+
 <script>
     let productos = [];
     let currentIndex = null;
     const dbCollection = db.collection("producto");
 
     async function saveProducto() {
-        const productoForm = document.forms.productoForm;
-        const newProducto = {
-            nombre: productoForm.nombre.value,
-            marca: productoForm.marca.value,
-            tipo: productoForm.tipo.value,
-            descripcion: productoForm.descripcion.value,
-            volumen: parseFloat(productoForm.volumen.value),
-            grado: parseFloat(productoForm.grado.value),
-            stock: parseInt(productoForm.stock.value),
-            categoria: productoForm.categoria.value,
-            valoracion: parseFloat(productoForm.valoracion.value),
-            precio: parseFloat(productoForm.precio.value),
+        const productoForm = document.getElementById('productoForm');
+        const nombre = productoForm['nombre'].value;
+        const marca = productoForm['marca'].value;
+        const tipo = productoForm['tipo'].value;
+        const descripcion = productoForm['descripcion'].value;
+        const volumen = parseInt(productoForm['volumen'].value);
+        const grado = parseInt(productoForm['grado'].value);
+        const stock = parseInt(productoForm['stock'].value);
+        const categoria = productoForm['categoria'].value;
+        const valoracion = parseInt(productoForm['valoracion'].value);
+        const precio = parseInt(productoForm['precio'].value);
+
+        const producto = {
+            nombre,
+            marca,
+            tipo,
+            descripcion,
+            volumen,
+            grado,
+            stock,
+            categoria,
+            valoracion,
+            precio
         };
 
         if (currentIndex === null) {
-            await dbCollection.add(newProducto);
+            await dbCollection.add(producto);
         } else {
-            const id = productos[currentIndex].id;
-            await dbCollection.doc(id).update(newProducto);
+            await dbCollection.doc(productos[currentIndex].id).set(producto);
+            currentIndex = null;
         }
 
-        loadProductos();
         productoForm.reset();
-        currentIndex = null;
+        loadProductos();
     }
 
-    async function loadProductos() {
-        const snapshot = await dbCollection.get();
-        productos = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
-        renderTable();
+    function loadProductos() {
+        dbCollection.onSnapshot((querySnapshot) => {
+            productos = [];
+            querySnapshot.forEach((doc) => {
+                productos.push({
+                    id: doc.id,
+                    ...doc.data()
+                });
+            });
+            renderProductos();
+        });
     }
 
-    function renderTable() {
-        const tableBody = document.getElementById('productoTableBody');
-        tableBody.innerHTML = '';
-
+    function renderProductos() {
+        const productoTableBody = document.getElementById('productoTableBody');
+        productoTableBody.innerHTML = '';
         productos.forEach((producto, index) => {
-            const row = document.createElement('tr');
-
-            row.innerHTML = `
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
                 <td>${producto.nombre}</td>
                 <td>${producto.marca}</td>
                 <td>${producto.tipo}</td>
@@ -212,39 +236,33 @@
                 <td>${producto.valoracion}</td>
                 <td>${producto.precio}</td>
                 <td>
-                    <button onclick="loadForm(${index})">Editar</button>
-                    <button onclick="deleteProducto(${index})">Eliminar</button>
+                    <button onclick="editProducto(${index})">Editar</button>
+                    <button onclick="deleteProducto('${producto.id}')">Eliminar</button>
                 </td>
             `;
-            tableBody.appendChild(row);
+            productoTableBody.appendChild(tr);
         });
     }
 
-    function loadForm(index) {
+    function editProducto(index) {
         const producto = productos[index];
-        const productoForm = document.forms.productoForm;
-        productoForm.nombre.value = producto.nombre;
-        productoForm.marca.value = producto.marca;
-        productoForm.tipo.value = producto.tipo;
-        productoForm.descripcion.value = producto.descripcion;
-        productoForm.volumen.value = producto.volumen;
-        productoForm.grado.value = producto.grado;
-        productoForm.stock.value = producto.stock;
-        productoForm.categoria.value = producto.categoria;
-        productoForm.valoracion.value = producto.valoracion;
-        productoForm.precio.value = producto.precio;
+        const productoForm = document.getElementById('productoForm');
+        productoForm['nombre'].value = producto.nombre;
+        productoForm['marca'].value = producto.marca;
+        productoForm['tipo'].value = producto.tipo;
+        productoForm['descripcion'].value = producto.descripcion;
+        productoForm['volumen'].value = producto.volumen;
+        productoForm['grado'].value = producto.grado;
+        productoForm['stock'].value = producto.stock;
+        productoForm['categoria'].value = producto.categoria;
+        productoForm['valoracion'].value = producto.valoracion;
+        productoForm['precio'].value = producto.precio;
+
         currentIndex = index;
     }
 
-    async function deleteProducto(index) {
-        const id = productos[index].id;
-        await dbCollection.doc(id).delete();
-        loadProductos();
-        document.forms.productoForm.reset();
-        currentIndex = null;
+    function deleteProducto(id) {
+        dbCollection.doc(id).delete();
     }
 
-    loadProductos();
-</script>
-</body>
-</html>
+    document.addEventListener('DOMContentLoaded',

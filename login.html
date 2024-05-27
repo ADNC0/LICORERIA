@@ -55,23 +55,29 @@
                 return;
             }
 
-            // Iniciar sesión
-            auth.signInWithEmailAndPassword(email, password)
-                .then((userCredential) => {
-                    // Usuario inició sesión correctamente
-                    window.location.href = 'index.html';
-                })
-                .catch((error) => {
-                    // Manejo de errores de inicio de sesión
-                    if (error.code === 'auth/user-not-found') {
-                        alert('Usuario no encontrado. Verifica tu correo y contraseña.');
-                    } else if (error.code === 'auth/wrong-password') {
-                        alert('Contraseña incorrecta. Verifica tu contraseña.');
-                    } else {
-                        alert('Error al iniciar sesión. Por favor, inténtalo de nuevo más tarde.');
-                        console.error('Error de inicio de sesión:', error);
-                    }
-                });
+            // Validar credenciales específicas
+            if ((email === 'usuario@utc.edu.ec' && password === '123') ||
+                (email === 'admin@utc.edu.ec' && password === '123')) {
+                // Iniciar sesión
+                auth.signInWithEmailAndPassword(email, password)
+                    .then((userCredential) => {
+                        // Usuario inició sesión correctamente
+                        window.location.href = 'index.html';
+                    })
+                    .catch((error) => {
+                        // Manejo de errores de inicio de sesión
+                        if (error.code === 'auth/user-not-found') {
+                            alert('Usuario no encontrado. Verifica tu correo y contraseña.');
+                        } else if (error.code === 'auth/wrong-password') {
+                            alert('Contraseña incorrecta. Verifica tu contraseña.');
+                        } else {
+                            alert('Error al iniciar sesión. Por favor, inténtalo de nuevo más tarde.');
+                            console.error('Error de inicio de sesión:', error);
+                        }
+                    });
+            } else {
+                alert('Credenciales incorrectas.');
+            }
         }
     </script>
 </head>

@@ -80,13 +80,13 @@
     <script>
         // Configuración de Firebase
         const firebaseConfig = {
-            apiKey: "TU_API_KEY",
-            authDomain: "TU_AUTH_DOMAIN",
-            projectId: "TU_PROJECT_ID",
-            storageBucket: "TU_STORAGE_BUCKET",
-            messagingSenderId: "TU_MESSAGING_SENDER_ID",
-            appId: "TU_APP_ID",
-            measurementId: "TU_MEASUREMENT_ID"
+            apiKey: "AIzaSyBtbwtEV54UibTbNI2rLS08xhiR0CquMC0",
+            authDomain: "licoreria-c33d4.firebaseapp.com",
+            projectId: "licoreria-c33d4",
+            storageBucket: "licoreria-c33d4.appspot.com",
+            messagingSenderId: "236261862007",
+            appId: "1:236261862007:web:78f96318a93f483b92b472",
+            measurementId: "G-BW9GSQNXW6"
         };
         // Inicializar Firebase
         firebase.initializeApp(firebaseConfig);
@@ -188,26 +188,62 @@
             currentIndex = index;
         }
 
-        function deleteProducto(id) {
-            dbCollection.doc(id).delete();
+        async function deleteProducto(id) {
+            if (confirm('¿Está seguro de eliminar este producto?')) {
+                await dbCollection.doc(id).delete();
+                loadProductos();
+            }
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            loadProductos();
-        });
+        window.onload = function() {
+            const logoutButton = document.getElementById('logoutButton');
+            logoutButton.addEventListener('click', async function() {
+                await firebase.auth().signOut();
+                window.location.href = 'login.html';
+            });
+
+            firebase.auth().onAuthStateChanged((user) => {
+                if (!user) {
+                    window.location.href = 'login.html';
+                } else {
+                    loadProductos();
+                }
+            });
+        };
     </script>
 </head>
 <body>
+
 <header>
-    <a href="login.html"><button>Logueo</button></a>
-    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcStoerRU2bpHDVdA7Xt-5AIrG7TR6-ohu_0yBuDuKslmQ&s" alt="Logo">
-    <h1>BAR</h1>
+    <img src="https://img.freepik.com/foto-gratis/lobo-colorido-fondo-negro_1340-40203.jpg" alt="Logo">
+    <h1>LICORERIA AC</h1>
 </header>
 
 <main>
-    <h2>Registro de Productos</h2>
+    <h2>Productos</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Marca</th>
+                <th>Tipo</th>
+                <th>Descripción</th>
+                <th>Volumen</th>
+                <th>Grado</th>
+                <th>Stock</th>
+                <th>Categoría</th>
+                <th>Valoración</th>
+                <th>Precio</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody id="productoTableBody">
+            <!-- Productos se cargan aquí -->
+        </tbody>
+    </table>
 
-    <form id="productoForm">
+    <h2>Formulario de Producto</h2>
+    <form id="productoForm" onsubmit="saveProducto(); return false;">
         <label for="nombre">Nombre:</label>
         <input type="text" id="nombre" name="nombre" required>
 
@@ -223,7 +259,7 @@
         <label for="volumen">Volumen:</label>
         <input type="number" id="volumen" name="volumen" required>
 
-        <label for="grado">Grado de Alcohol:</label>
+        <label for="grado">Grado:</label>
         <input type="number" id="grado" name="grado" required>
 
         <label for="stock">Stock:</label>
@@ -238,35 +274,5 @@
         <label for="precio">Precio:</label>
         <input type="number" id="precio" name="precio" required>
 
-        <button type="button" onclick="saveProducto()">Guardar</button>
+        <button type="submit">Guardar Producto</button>
     </form>
-
-    <h2>EN LISTA</h2>
-    <table id="productoTable">
-        <thead>
-            <tr>
-                <th>Nombre</th>
-                <th>Marca</th>
-                <th>Tipo</th>
-                <th>Descripción</th>
-                <th>Volumen</th>
-                <th>Grado de Alcohol</th>
-                <th>Stock</th>
-                <th>Categoría</th>
-                <th>Valoración</th>
-                <th>Precio</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody id="productoTableBody">
-            <!-- Filas se añadirán dinámicament -->
-        </tbody>
-    </table>
-</main>
-
-<footer>
-    <p>&copy; RESERVADO POR ABRAHAM NACIMBA</p>
-</footer>
-
-</body>
-</html>

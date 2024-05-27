@@ -33,7 +33,7 @@
     <script>
         // Configuración de Firebase
         const firebaseConfig = {
-            apiKey: "Tu-API-Key",
+            apiKey: "AIzaSyBtbwtEV54UibTbNI2rLS08xhiR0CquMC0",
             authDomain: "licoreria-c33d4.firebaseapp.com",
             projectId: "licoreria-c33d4",
             storageBucket: "licoreria-c33d4.appspot.com",
@@ -62,8 +62,15 @@
                     window.location.href = 'index.html';
                 })
                 .catch((error) => {
-                    alert('Usuario o contraseña incorrectos.');
-                    console.error('Error de inicio de sesión:', error);
+                    // Manejo de errores de inicio de sesión
+                    if (error.code === 'auth/user-not-found') {
+                        alert('Usuario no encontrado. Verifica tu correo y contraseña.');
+                    } else if (error.code === 'auth/wrong-password') {
+                        alert('Contraseña incorrecta. Verifica tu contraseña.');
+                    } else {
+                        alert('Error al iniciar sesión. Por favor, inténtalo de nuevo más tarde.');
+                        console.error('Error de inicio de sesión:', error);
+                    }
                 });
         }
     </script>
